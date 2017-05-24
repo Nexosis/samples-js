@@ -43,7 +43,7 @@ namespace Nexosis.Api.Samples
                     sessionReturned = true;
                     var sessionResults = client.GetSessionResultsAsync(newSession.SessionId).Result;
                     var json = AsJson(sessionResults);
-                    Console.WriteLine($"Results ready. Here's a preview... {json.Substring(0,300)}");
+                    Console.WriteLine($"Results ready. Here's a preview... {json.Substring(0, 300)}");
                 }
                 else
                 {
@@ -149,7 +149,7 @@ namespace Nexosis.Api.Samples
 
                 for (var index = 1; index < columns.Length; index++)
                 {
-                    row.Values[columns[index]] = GetRandomDouble();
+                    row.Values[columns[index]] = GetRandomDouble(_totalObservationsCreated);
                 }
                 return row;
             }
@@ -157,14 +157,14 @@ namespace Nexosis.Api.Samples
             Random _random;
             private Random RandomGen { get { if (_random == null) _random = new Random(); return _random; } }
 
-            public double GetRandomDouble()
+            public double GetRandomDouble(int index)
             {
-                //Synthetic growth (yearly if daily observations, more quickly for hourly, etc.)
-                var start = RandomGen.NextDouble();
-                var min = _totalObservationsCreated / 365;
-                var max = min + 30;
-                var multiple = RandomGen.Next(min, max);
-                return start * (double)multiple;
+                var trendComponent = .002;
+                var constant = .02;
+                var seasonalComponent = Math.Sin(2 * Math.PI * index / 7) * 1.2;
+                var noise = RandomGen.NextDouble() * .0001;
+                var observation = trendComponent * index + constant + seasonalComponent + noise;
+                return observation;
             }
         }
     }
