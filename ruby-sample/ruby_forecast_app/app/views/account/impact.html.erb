@@ -2,7 +2,7 @@
     <div class="alert alert-success">
         <%= "Your impact request has been submitted. This job cost $#{@impact_result.cost}. Your remaining balance is now $#{@impact_result.account_balance}." %>
         <div>
-            <a href="/account/forecast/<%= @impact_result.session.dataSetName %>">Submit another session</a>
+            <a href="/account/impact/<%= @impact_result.session.dataSetName %>">Submit another session</a>
             </div>
             <div>
             <a href="/account/session/<%= @impact_result.session.sessionId %>">See session status</a>

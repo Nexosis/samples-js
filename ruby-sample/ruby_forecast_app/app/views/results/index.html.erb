@@ -6,7 +6,11 @@
 <h1>Session Information for <%= @sessionResult.session.sessionId %></h1>
 <p class="lead">Dataset used: <%=@sessionResult.session.dataSetName%></p>
 <div class="row">
-   <h5>Prediction Range:</h5>
+    <h5>Session Type:</h5>
+    <div class="col-sm-3"><%=@sessionResult.session.type%></div>
+</div>
+<div class="row">
+   <h5><%= @sessionResult.session.type == "forecast" ? "Prediction" : "Impact Event " %> Range:</h5>
    <div class="col-sm-3">Start Date: <%= Date.rfc3339(@sessionResult.session.startDate).strftime("%m/%d/%Y %I:%M%p") %></div>
    <div class="col-sm-3">End Date: <%= Date.rfc3339(@sessionResult.session.endDate).strftime("%m/%d/%Y %I:%M%p")%></div>
 </div>
@@ -14,9 +18,11 @@
    <h5>Target Column:</h5>
    <div class="col-sm-3"><%=@sessionResult.session.targetColumn%></div>
 </div>
+<%if @sessionResult.session.type == "forecast"%>
 <div class="row">
    <div class="col-sm-3"><a href="/results/champion/<%=URI::encode(@sessionResult.session.dataSetName.gsub(/[.]/,'%2E'))%>/<%=URI::encode(@sessionResult.session.targetColumn)%>">See prediction run details</a></div>
 </div>
+<%end%>
 <div class="col-xs-12">
    <hr>
 </div>

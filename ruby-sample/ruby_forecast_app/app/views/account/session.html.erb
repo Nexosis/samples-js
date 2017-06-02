@@ -18,6 +18,11 @@
       </table>
    </div>
 </div>
+    <%if @session.statusHistory.select {|v| v.has_value? "completed"}[0].nil? == false %>
+        <div class="row">
+            <a href="/results/<%=URI::encode(@session.sessionId)%>">See Results</a>
+        </div>
+    <%end%>
 <%else%>
 <div class="alert alert-warning">
    No session was found

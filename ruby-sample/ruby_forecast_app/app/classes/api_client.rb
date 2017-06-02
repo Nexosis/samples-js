@@ -74,11 +74,10 @@ class ApiClient
 			"page" => page,
 			"pageSize" => page_size
 		}
-		Rails.cache.fetch(dataset_query_url + query.inspect) do
 		response = self.class.get(dataset_query_url,:headers => @headers, :query => query)
-			if(response.success?)
-				response.parsed_response["data"]
-			end
+		if(response.success?)
+			Rails.cache.write(dataset_query_url + query.inspect, response.parsed_response["data"])
+			response.parsed_response["data"]
 		end
 	end
 
