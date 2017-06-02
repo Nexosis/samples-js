@@ -1,0 +1,40 @@
+<h1>Account Information</h1>
+<p class="lead">
+   Current Balance: <%= number_to_currency(@account_balance) %>
+</p>
+<%if @uploadMessage.nil? == false %>
+<div class="alert alert-success">
+    <%= @uploadMessage %>
+</div>
+<%end%>
+<div class="container">
+<% if @datasets.nil? == false && @datasets.length > 0 %>
+<div class="row">
+    <h4>Existing Datasets</h4>
+    <%if(@datasets.is_a? String)%>
+        There was a problem retrieving data sets for this account.
+        <p>@datasets</p>
+    <%else%>
+    <% @datasets.each do |ds| %>
+        <div>
+        <%= ds["dataSetName"] %> <a href="/account/forecast/<%= URI::encode(ds["dataSetName"]) %>">Begin Forecast</a>  | <a href="/account/impact/<%= URI::encode(ds["dataSetName"]) %>">Begin Impact Analysis</a>
+        </div>
+    <% end %>
+    <%end%>
+</div>
+<div class="col-xs-12">
+<hr/>
+</div>
+<%end%>
+<div class="row">
+   <p>Upload a csv file (for this app, file assumed to have 'timestamp' column and is assumed to have headers):</p>
+   <%= form_tag({action: :upload}, multipart: true) do %>
+   <label for="dataset_name">Dataset Name:</label>
+   <input id="dataset_name" name="dataset_name" type="text">
+   <div>
+      <%= file_field_tag 'datafile' %>
+   </div>
+   <input type="submit" text="upload file">
+   <% end %>
+   </div>
+</div>

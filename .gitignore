@@ -57,3 +57,27 @@ typings/
 # dotenv environment variables file
 .env
 
+**/.DS_Store
+
+#RUBY…
+
+# Ignore all logfiles and tempfiles.
+/log/*
+**/tmp/*
+!/log/.keep
+!/tmp/.keep
+
+*.rbc
+capybara-*.html
+.rspec
+/tmp
+/db/*.sqlite3
+/db/*.sqlite3-journal
+/public/system
+/coverage/
+/spec/tmp
+*.orig
+rerun.txt
+pickle-email-*.html
+
+secrets.yml

@@ -1,0 +1,10 @@
+// Place your settings in this file to overwrite default and user settings.
+{
+    "debride": {
+	    "rails": true //Add some rails call conversions.
+    },
+    "ruby-lint": {
+	    "levels": [/* a subset of these */ "error","warning","info"],
+	    "classes":[ /* a subset of these */ "argument_amount", "loop_keywords", "pedantics", "shadowing_variables", "undefined_methods", "undefined_variables", "unused_variables", "useless_equality_checks" ]
+    }
+}

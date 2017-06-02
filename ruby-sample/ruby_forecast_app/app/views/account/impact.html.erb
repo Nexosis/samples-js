@@ -1,0 +1,50 @@
+<%if @impact_result.nil? == false %>
+    <div class="alert alert-success">
+        <%= "Your impact request has been submitted. This job cost $#{@impact_result.cost}. Your remaining balance is now $#{@impact_result.account_balance}." %>
+        <div>
+            <a href="/account/forecast/<%= @impact_result.session.dataSetName %>">Submit another session</a>
+            </div>
+            <div>
+            <a href="/account/session/<%= @impact_result.session.sessionId %>">See session status</a>
+        </div>
+    </div>
+<%else%>
+    <%if @error.nil? == false %>
+        <div class="row">
+            <div class="alert alert-danger">
+                <p>An error was thrown by the api client - <%= @error.message %> </p>
+                <div>Response Status: <%= @error.response.code %> - <%= @error.response.message %></div>
+            </div>
+        </div>
+    <%end%>
+    <div class="row">
+    <h4>Create a new impact session for <%= @dataset_name %> </h4>
+        <%= form_tag({action: :create_impact}) do %>  
+            <input type="hidden" name="dataset_name" value="<%= @dataset_name %>">
+            <div>
+                <label for="target_column">Column to predict:</label> <input type="text" name="target_column">
+            </div>
+             <div>
+                <label for="event_name">Event Name:</label> <input type="text" name="event_name">
+                <small class="text-muted">
+                    Provide a descriptive name for the impact event.
+                </small>
+            </div>
+            <div>
+                <label for="start_date">Event Start Date:</label> <input type="text" name="start_date">
+                <small class="text-muted">
+                    The start date of the event on which to identify impact
+                </small>
+            </div>
+            <div>
+                <label for="end_date">Event End Date:</label> <input type="text" name="end_date">
+                <small class="text-muted">
+                    The end date of the event; must be after start.
+                </small>
+            </div>
+            <div>
+                <input type="submit" text="create impact session">
+            </div>
+        <% end %>
+    </div>
+<%end%>

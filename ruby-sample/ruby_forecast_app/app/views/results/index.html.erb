@@ -1,0 +1,158 @@
+<% content_for :header do %>
+<link rel="stylesheet" href="https://cdn.rawgit.com/novus/nvd3/v1.8.1/build/nv.d3.css">
+<script src="https://d3js.org/d3.v3.min.js"></script>
+<script src="https://cdn.rawgit.com/novus/nvd3/v1.8.1/build/nv.d3.min.js"></script>
+<%end%>
+<h1>Session Information for <%= @sessionResult.session.sessionId %></h1>
+<p class="lead">Dataset used: <%=@sessionResult.session.dataSetName%></p>
+<div class="row">
+   <h5>Prediction Range:</h5>
+   <div class="col-sm-3">Start Date: <%= Date.rfc3339(@sessionResult.session.startDate).strftime("%m/%d/%Y %I:%M%p") %></div>
+   <div class="col-sm-3">End Date: <%= Date.rfc3339(@sessionResult.session.endDate).strftime("%m/%d/%Y %I:%M%p")%></div>
+</div>
+<div class="row">
+   <h5>Target Column:</h5>
+   <div class="col-sm-3"><%=@sessionResult.session.targetColumn%></div>
+</div>
+<div class="row">
+   <div class="col-sm-3"><a href="/results/champion/<%=URI::encode(@sessionResult.session.dataSetName.gsub(/[.]/,'%2E'))%>/<%=URI::encode(@sessionResult.session.targetColumn)%>">See prediction run details</a></div>
+</div>
+<div class="col-xs-12">
+   <hr>
+</div>
+<div class="col-md-8">
+<div id="chart" style="height:400px">
+   <svg><text x="100" y="100" font-family="sans-serif" font-size="10px" fill="red">If no chart, try refreshing the page</text></svg>
+</div>
+<div>
+<div class="col-xs-12">
+   <hr>
+</div>
+<div class="row">
+   <div id="observationTable" class="col-md-4">
+      Observation Data:
+      <table id="observedDataTable" class="table table-striped">
+         <tr>
+            <th>
+               Timestamp
+            </th>
+            <th>
+               Observation
+            </th>
+         </tr>
+      </table>
+   </div>
+   <div id="resultTable" class="col-md-4">
+      Result Data:
+      <table id="dataTable" class="table table-striped">
+         <tr>
+            <th>
+               Timestamp
+            </th>
+            <th>
+               Prediction
+            </th>
+         </tr>
+      </table>
+   </div>
+</div>
+<% content_for :before_body_end do %>
+
+<script type="text/javascript">
+$(document).ready(function(){
+   var observationData = <%= render inline: @observations.to_json%>;
+   var predictionData = <%= render inline: @sessionResult.data.to_json%>;
+   var obsValues = [];
+   var predValues = [];
+   dataKey = "<%=@sessionResult.session.targetColumn%>";
+   
+   var table = document.getElementById("dataTable");
+   for (var i = 0; i < predictionData.length; i++) 
+   {
+       var record = predictionData[i];
+       var tr = document.createElement('tr');   
+   
+       var td1 = document.createElement('td');
+       var td2 = document.createElement('td');
+   
+       var text1 = document.createTextNode(new Date(record.timestamp).toLocaleDateString('en-US'));
+       predValues[i] = {x: new Date(record.timestamp), y: record.values[dataKey]};
+       var text2 = document.createTextNode(record.values[dataKey]);
+   
+   
+       td1.appendChild(text1);
+       td2.appendChild(text2);
+       tr.appendChild(td1);
+       tr.appendChild(td2);
+   
+       table.appendChild(tr);
+   }
+   
+   var obsTable = document.getElementById("observedDataTable");
+   for (var i = 0; i < observationData.length; i++) 
+   {
+       var record = observationData[i];
+       var tr = document.createElement('tr');   
+   
+       var td1 = document.createElement('td');
+       var td2 = document.createElement('td');
+   
+       var text1 = document.createTextNode(new Date(record.timestamp).toLocaleDateString('en-US'));
+       obsValues[i] = {x: new Date(record.timestamp), y: record.values[dataKey]};
+       var text2 = document.createTextNode(record.values[dataKey]);
+   
+       td1.appendChild(text1);
+       td2.appendChild(text2);
+       tr.appendChild(td1);
+       tr.appendChild(td2);
+   
+       obsTable.appendChild(tr);
+   }
+   
+   function getChart(){
+        nv.addGraph(function() {
+                var chart = nv.models.lineChart()
+                        .margin({left: 100})  //Adjust chart margins to give the x-axis some breathing room.
+                        .useInteractiveGuideline(true)  //We want nice looking tooltips and a guideline!
+                        .duration(350)  //how fast do you want the lines to transition?
+                        .showLegend(true)       //Show the legend, allowing users to turn on/off line series.
+                        .showYAxis(true)        //Show the y-axis
+                        .showXAxis(true)        //Show the x-axis
+        ;
+        
+        chart.xAxis     //Chart x-axis settings
+            .axisLabel('Time (ms)')
+            .tickFormat(function(d) { return d3.time.format('%b %d')(new Date(d)); });
+        
+        chart.yAxis     //Chart y-axis settings
+            .axisLabel(dataKey)
+            .tickFormat(d3.format('10.0f'));
+        
+        /* Done setting the chart up? Time to render it!*/
+        var myData =  [{
+            values: obsValues,
+            key: dataKey + " observed",
+            color: '#ff7f0e'
+        },{
+            values: predValues,
+            key: dataKey + " predicted",
+            color: '#2ca02c'
+        }
+        ] 
+        
+        var chartSvg = d3.select('#chart svg');
+        chartSvg.selectAll("*").remove(); //remove the text node warning of content problems.
+        d3.select('#chart svg')    //Select the <svg> element you want to render the chart in.   
+            .datum(myData)         //Populate the <svg> element with chart data...
+            .call(chart);          //Finally, render the chart!
+        
+        //Update the chart when window resizes.
+        nv.utils.windowResize(function() { chart.update() });
+            return chart;
+        });
+   }
+   //HACK: was having problems with nv being defined.
+   setTimeout(getChart, 500);
+});
+</script>
+<%end%>

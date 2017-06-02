@@ -1,0 +1,25 @@
+<h2>Champion Selection Results</h2>
+<%if(@champion.nil?)%>
+<div class="alert alert-warning">no results found for this dataset and target</div>
+<%else%>
+<div class="container">
+   <h4>Algorithm Used for Predictions</h4>
+   <h5><%= @champion.winningAlgorithm.champion.algorithm.code %></h5>
+   <p><%= @champion.winningAlgorithm.champion.algorithm.description %></p>
+   <div class="row">
+      <div class="col-md-4">
+         <h4>Metrics</h4>
+         <table class="table">
+            <%@champion.winningAlgorithm.champion.metrics.each do |metric|%>
+            <tr>
+               <td>
+                  <%= metric.code%>
+               <td>
+               <td><%= metric.value %></td>
+            </tr>
+            <%end%>
+         </table>
+      </div>
+   </div>
+</div>
+<%end%>
