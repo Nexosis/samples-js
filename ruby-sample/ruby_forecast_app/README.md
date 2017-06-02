@@ -5,11 +5,15 @@ This application is a simple sample, and therefore relatively straightforward. O
 
 * **Ruby version** - _2.4.1p111 (2017-03-22 revision 58053)_
 
-* **System dependencies** - _none_
+* **Application dependencies** - 
+	* NVD3 charting for results page
+	* Bootstrap for basic styling
+	* Httparty for making api requests in api_client
+	* a number of gems have been included for local ruby support in Visual Studio Code in which this was written
 
 * **Configuration** - _Your config/secrets.yml file should contain an entry for 'api-key', or you should modify the use of the api key in the code. It's in there a lot, so I suggest updating the config._
 
-* **Database creation** - _This application does not use a database._
+* **Database creation** - _This application does not use a database - but the default rails setup of sqlite has been retained._
 
 * **How to run the test suite** - _pretty light on tests, but the api_client tests can be run by calling:_
  ```bash
