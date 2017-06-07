@@ -25,7 +25,7 @@
     </div>
     <%end%>
     <div class="row">
-    <h4>Create a new forecast session for <%= @dataset_name %> </h4>
+    <h4>Create a new forecast session for <%= @dataset_name %><%= @forecast_result.session.dataSetName unless @forecast_result.nil? %></h4>
         <%= form_tag({action: :create_forecast}) do %>  
             <input type="hidden" name="dataset_name" value="<%= @dataset_name %>">
             <div>

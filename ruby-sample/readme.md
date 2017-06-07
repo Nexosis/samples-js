@@ -85,7 +85,16 @@ In the example above I have used the *Location C.csv* sample data file. You shou
 
 ![](docs/forecast_success.png)
 
-Having started off the session we can now see two new links - one to start over and request another session on the same dataset, and another to see the status of the session we've submitted. Sessions will take longer to run the first time you request them on a dataset because we run our algorithm selection process to determine how best to forecast your result. While we will run this again in the future to make sure we keep giving the best results, we will keep the selection around for a while, making subsequent sessions on the same dataset run much more quickly. 
+Having started off the session we can now see two new links - one to start over and request another session on the same dataset, and another to see the status of the session we've submitted. 
+#### Session Estimates
+You might have noticed the checkbox to "estimate" the forecast session in the screenshot above. If you want to figure out what something will cost before you do it, just send the "isEstimate=true" value in the query string of your request. In the case of our mini-app you'll see the value returned to you at the top of the page.
+
+![estimate](docs/estimate.png)
+
+Your values have been pre-filled, so if you're ready to go ahead just hit the submit button again.
+<hr/>
+Sessions will take longer to run the first time you request them on a dataset because we run our algorithm selection process to determine how best to forecast your result. While we will run this again in the future to make sure we keep giving the best results, we will keep the selection around for a while, making subsequent sessions on the same dataset run much more quickly. 
+
 >  If you submit data and run a session we will run the algorithm selection process every time.
 
 ![session status](docs/session_status.png)
@@ -207,7 +216,7 @@ While similar in most regards, there are a couple of differences to note about i
    "data removed" : "..."
 }
 ```
-The results above come from running an impact analysis on the transactions column of the Location C sample dataset from 5/1/2016-5/10/2016. 
+The results above come from running an impact analysis on the transactions column of the Location C sample dataset from 5/1/2016-5/10/2016. If you run these yourself you'll see the metrics on the results page of the session in the sample application.
 - **pValue**: Statistical value used to determine the significance of the impact. A small p-value indicates strong evidence of impact, whereas a p-value approaching 0.5 indicates weak evidence of impact. In the example above we have a ambiguous result - which is reasonable given that no known event actually occurred on the dates provided.
 - **absoluteEffect**: Total absolute effect of the event on the dataset. Answers the question, "How much did this event affect my dataset?" During the 10 days of this example impact run, transactions were postively impacted by a 446 transaction increase. This is a relatively strong impact - but again with an ambiguous meaning given the p-value.
 - **relativeEffect**: Percentage impact of the event on the dataset. Answers the question, "By what percentage did this event affect my dataset?". While closely related to the absolute effect, this is a percentage of the mean of all predictions created during an iterative process - not the strict percentage of the absolute against observed or predicted totals within the impact time slice. 

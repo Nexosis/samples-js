@@ -6,7 +6,7 @@ module NexosisApi
            end
         end
 
-        attr_accessor :pvalue
+        attr_accessor :pValue
         attr_accessor :absoluteEffect
         attr_accessor :relativeEffect
     end

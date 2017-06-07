@@ -5,6 +5,7 @@ require 'csv'
 class ApiClient
 	include HTTParty
 	base_uri 'https://ml.nexosis.com/api'
+
 	def initialize(key)
 		@apiKey = key
 		@headers = {"api-key" => @apiKey, "content-type" => "application/json"}

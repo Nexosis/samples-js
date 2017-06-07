@@ -22,28 +22,28 @@
         <%= form_tag({action: :create_impact}) do %>  
             <input type="hidden" name="dataset_name" value="<%= @dataset_name %>">
             <div>
-                <label for="target_column">Column to predict:</label> <input type="text" name="target_column">
+                <label for="target_column">Column to predict:</label> <input type="text" name="target_column" value="<%= @forecast_result.session.targetColumn unless @forecast_result.nil? %>">
             </div>
              <div>
-                <label for="event_name">Event Name:</label> <input type="text" name="event_name">
+                <label for="event_name">Event Name:</label> <input type="text" name="event_name" value="<%= @event_name unless @forecast_result.nil? %>">
                 <small class="text-muted">
                     Provide a descriptive name for the impact event.
                 </small>
             </div>
             <div>
-                <label for="start_date">Event Start Date:</label> <input type="text" name="start_date">
+                <label for="start_date">Event Start Date:</label> <input type="text" name="start_date" value="<%= @forecast_result.session.startDate unless @forecast_result.nil? %>">
                 <small class="text-muted">
                     The start date of the event on which to identify impact
                 </small>
             </div>
             <div>
-                <label for="end_date">Event End Date:</label> <input type="text" name="end_date">
+                <label for="end_date">Event End Date:</label> <input type="text" name="end_date" value="<%= @forecast_result.session.endDate unless @forecast_result.nil? %>">
                 <small class="text-muted">
                     The end date of the event; must be after start.
                 </small>
             </div>
             <div>
-                <label for="is_estimate">Estimate Only</label><input type="checkbox" name="is_estimate"/>
+                <label for="is_estimate">Estimate Only</label><input type="checkbox" name="is_estimate" />
             </div>
             <div>
                 <input type="submit" text="create impact session">
