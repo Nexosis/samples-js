@@ -53,9 +53,11 @@ class AccountController < ApplicationController
 		params.require(:target_column)
 		params.require(:start_date)
 		params.require(:end_date)
+		params.require(:is_estimate)
 		client = ApiClient.new(Rails.application.secrets.api_key)
+		estimate_only = params["is_estimate"] == "on" ? true : false
 		begin
-			@forecast_result = client.create_session params["dataset_name"], params["target_column"], params["start_date"], params["end_date"]
+			@forecast_result = client.create_session params["dataset_name"], params["target_column"], params["start_date"], params["end_date"], estimate_only
 		rescue HttpException => http_error
 			@error = http_error
 		end
@@ -73,9 +75,11 @@ class AccountController < ApplicationController
 		params.require(:start_date)
 		params.require(:end_date)
 		params.require(:event_name)
+		params.require(:is_estimate)
 		client = ApiClient.new(Rails.application.secrets.api_key)
+		estimate_only = params["is_estimate"] == "on" ? true : false
 		begin
-			@impact_result = client.create_session params["dataset_name"], params["target_column"], params["start_date"], params["end_date"], params["event_name"], "impact"
+			@impact_result = client.create_session params["dataset_name"], params["target_column"], params["start_date"], params["end_date"], estimate_only , params["event_name"], "impact"
 		rescue HttpException => http_error
 			@error = http_error
 		end

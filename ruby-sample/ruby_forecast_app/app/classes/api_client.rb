@@ -5,7 +5,6 @@ require 'csv'
 class ApiClient
 	include HTTParty
 	base_uri 'https://ml.nexosis.com/api'
-	
 	def initialize(key)
 		@apiKey = key
 		@headers = {"api-key" => @apiKey, "content-type" => "application/json"}
@@ -91,13 +90,14 @@ class ApiClient
 		end
 	end
 
-	def create_session(dataset_name, target_column, start_date, end_date, event_name = nil, type = "forecast")
+	def create_session(dataset_name, target_column, start_date, end_date, is_estimate=false, event_name = nil, type = "forecast")
 		session_url = "/sessions/#{type}"
 		query = { 
 			"dataSetName" => dataset_name,
 			"targetColumn" => target_column,
 			"startDate" => start_date.to_s,
-			"endDate" => end_date.to_s
+			"endDate" => end_date.to_s,
+			"estimate" => is_estimate.to_s
 		}
 		if(event_name.nil? == false)
 			query["eventName"] = event_name
@@ -109,7 +109,7 @@ class ApiClient
 				NexosisApi::Session.new(response.parsed_response)
 			end
 			session_hash = {"session" => response.parsed_response}.merge(response.headers)
-			NexosisApi::ForecastResponse.new(session_hash)
+			NexosisApi::SessionResponse.new(session_hash)
 		else
 			raise HttpException.new("Unable to create new #{type} session","Create session for dataset #{dataset_name}",response)
 		end

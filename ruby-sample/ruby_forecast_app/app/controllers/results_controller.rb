@@ -6,10 +6,17 @@ class ResultsController < ApplicationController
     
     @sessionResult = client.get_session_results(params[:sessionId]);
     #TODO: cannot determine pages from API - need dataset information to be more specific
-    firstPred = Date.parse(@sessionResult.data[0]["timestamp"])
-    lastObs =  firstPred - 1
-    firstObs = firstPred - 30
-    @observations = client.get_dataset(@sessionResult.session.dataSetName, 0, 30, firstObs, lastObs)
+    if @sessionResult.session.type == "forecast"
+      firstPred = Date.parse(@sessionResult.data[0]["timestamp"])
+      lastObs =  firstPred - 1
+      firstObs = firstPred - 30
+      @observations = client.get_dataset(@sessionResult.session.dataSetName, 0, 30, firstObs, lastObs)
+    else
+      firstObs = Date.parse(@sessionResult.session.startDate) - 15
+      lastObs = Date.parse(@sessionResult.session.endDate) + 15
+      totalEventDays = (Date.parse(@sessionResult.session.endDate) - Date.parse(@sessionResult.session.startDate)).to_i
+      @observations = client.get_dataset(@sessionResult.session.dataSetName, 0, totalEventDays + 30, firstObs, lastObs)
+    end
   end
 
   def file
