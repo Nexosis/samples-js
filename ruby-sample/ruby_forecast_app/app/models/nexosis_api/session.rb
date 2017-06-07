@@ -6,6 +6,8 @@ module NexosisApi
 					links = Array.new
 					v.each do |l| links << NexosisApi::Link.new(l) end
 					instance_variable_set("@#{k}", links) unless v.nil?
+				elsif(k == "isEstimate")
+                    instance_variable_set("@is_estimate", v) unless v.nil?
 				else
 					instance_variable_set("@#{k}", v) unless v.nil?
 				end
@@ -22,6 +24,7 @@ module NexosisApi
 		attr_accessor :startDate
 		attr_accessor :endDate
 		attr_accessor :links
+		attr_accessor :is_estimate
 	end
 end
 

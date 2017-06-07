@@ -8,8 +8,6 @@ module NexosisApi
 					instance_variable_set("@cost", v[0]) unless v.nil?
                 elsif(k == "nexosis-account-balance")
                     instance_variable_set("@account_balance", v[0]) unless v.nil?
-                elsif(k == "isEstimate")
-                    instance_variable_set("@is_estimate", v) unless v.nil?
 				end
 			end
         end
@@ -17,6 +15,5 @@ module NexosisApi
         attr_accessor :session
         attr_accessor :cost
         attr_accessor :account_balance
-        attr_accessor :is_estimate
     end
 end

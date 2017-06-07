@@ -1,4 +1,4 @@
-<%if @forecast_result.nil? == false && @forecast_result.session.estimate == false%>
+<%if @forecast_result.nil? == false && @forecast_result.session.status != "estimated"%>
     <div class="alert alert-success">
         <%= "Your forecast request has been submitted. This job cost $#{@forecast_result.cost}. Your remaining balance is now $#{@forecast_result.account_balance}." %>
         <div>
@@ -17,10 +17,10 @@
             </div>
         </div>
     <%end%>
-    <%if @forecast_result.nil? == false && @forecast_result.session.estimate == true%>
+    <%if @forecast_result.nil? == false && @forecast_result.session.status == "estimated"%>
     <div class="row">
         <div class="alert alert-success">
-            This job will cost $#{@forecast_result.cost}.
+            This job will cost $<%=@forecast_result.cost%>.
         </div>
     </div>
     <%end%>
@@ -29,13 +29,13 @@
         <%= form_tag({action: :create_forecast}) do %>  
             <input type="hidden" name="dataset_name" value="<%= @dataset_name %>">
             <div>
-                <label for="target_column">Column to predict: </label><input type="text" name="target_column">
+                <label for="target_column">Column to predict: </label><input type="text" name="target_column" value="<%= @forecast_result.session.targetColumn unless @forecast_result.nil? %>">
             </div>
             <div>
-                <label for="start_date">Prediction Start Date: </label><input type="text" name="start_date">
+                <label for="start_date">Prediction Start Date: </label><input type="text" name="start_date" value="<%= @forecast_result.session.startDate unless @forecast_result.nil? %>">
             </div>
             <div>
-                <label for="end_date">Prediction End Date: </label><input type="text" name="end_date">
+                <label for="end_date">Prediction End Date: </label><input type="text" name="end_date" value="<%= @forecast_result.session.endDate unless @forecast_result.nil? %>">
             </div>
             <div>
                 <label for="is_estimate">Estimate Only</label><input type="checkbox" name="is_estimate"/>

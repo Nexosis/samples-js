@@ -97,7 +97,7 @@ class ApiClient
 			"targetColumn" => target_column,
 			"startDate" => start_date.to_s,
 			"endDate" => end_date.to_s,
-			"estimate" => is_estimate.to_s
+			"isestimate" => is_estimate.to_s
 		}
 		if(event_name.nil? == false)
 			query["eventName"] = event_name
