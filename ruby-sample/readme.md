@@ -54,7 +54,7 @@ end
 This application helps you load a CSV file you have locally as a dataset (*the API also accepts json input*). 
 > If you don't have a dataset of your own, trying using one of our publicly available samples at https://github.com/Nexosis/sampledata
 
-In order to have a named dataset you must also provide that name. Once you have done this and selected a file you can click submit and push the contents of the file to Nexosis. Again, this is a distnct operation from submitting a session request which would do work - we'll get to that soon. The api client for this application has been written to upload only 5000 lines at a time because we're sending the data as the request body and need to mind limits. We recommend using the S3 option with production datasets.
+In order to have a named dataset you must also provide that name. Once you have provided the name, and selected a file you can click the submit button. Again, this is a distinct operation from submitting a session request which would do work - we'll get to that soon. The api client for this application has been written to upload only 5000 lines at a time because we're sending the data as the request body and need to mind limits. We recommend using the S3 option with production datasets.
 ``` ruby
 csv.each do |row|
 	rowCount += 1
@@ -70,7 +70,7 @@ You may also notice in the snippet above that the CR/LF line feed type has been 
 Once you have a named dataset you can submit data again with the same name and either modify previously submitted data or add new. This is why we recommend using named datasets over sending data with a session request. With time series data the timestamp column will be used as the key for performing the upsert on your named dataset.
 ### Sessions
 <a name="Sessions"></a>
-Now that a dataset has been loaded you should see a new line on the /account page such as that shown highlighted in red below.
+Now that a dataset has been loaded you should see a new line on the */account* page such as that shown outlined in red below.
 
 <img src="docs/dataset_success.png" alt="datasets" height="412" width="401"/>
 
@@ -132,7 +132,7 @@ First off, when we requested a forecast session we immediately received a sessio
    ]
 }
 ```
-This object tells us the current status is 'requested', echos back some of what we told the session, and provides links to the Nexosis API where we might get additional information. If you're using one of our client libraries you don't really need to worry about all that - but in all cases the important thing for us is to somehow get hold of the sessionId value. This guid uniquely identifies your session and is the key to getting the results of that session (*If you lose track of it, you can always list out all your sessions from the /sessions endpoint*). Inside the Ruby sample application we've created a class to hold this session data similar to all other json-based DTOs used in this client and all our other language clients.
+This object tells us the current status is 'requested', echos back some of what we told the session, and provides links to the Nexosis API where we might get additional information. If you're using one of our client libraries you don't really need to worry about the links - but in all cases the important thing for us is to somehow get hold of the sessionId value. This guid uniquely identifies your session and is the key to getting the results of that session (*If you lose track of it, you can always list out all your sessions from the /sessions endpoint*). Inside the Ruby sample application we've created a class to hold this session data similar to all other json-based DTOs used in this client and all our other language clients.
 
 ``` ruby
 module NexosisApi
@@ -194,7 +194,7 @@ In order to build a visualization as in this sample application you need to pull
 
 #### Impact Sessions
 <a name="Impact"></a>
-While similar in most regards, there a couple of differences to note about impact analysis sessions. First, they'll take longer to run. We utilize a more complex algorithm with multiple iterations to land on the most accurate understanding of the given event's impact. Second, impact sessions utilize the dates for an event during which you want to understand the impact. Naturally these dates need to fall within the observation dates to make sense. It's also best in practice to measure events on smaller timeframes relative to the overall observation set as a long running event just becomes the new normal and loses predictive value. Finally, we provide a few metrics around the impact analysis to help you understand what we've found. This information populates the *metrics* object on the response json for an impact session:
+While similar in most regards, there are a couple of differences to note about impact analysis sessions. First, they'll take longer to run. We utilize a more complex algorithm with multiple iterations to land on the most accurate understanding of the given event's impact. Second, impact sessions utilize the dates for an event during which you want to understand the impact. Naturally these dates need to fall within the observation dates to make sense. It's also best in practice to measure events on smaller timeframes relative to the overall observation set as a long running event just becomes the new normal and loses predictive value. Finally, we provide a few metrics around the impact analysis to help you understand what we've found. This information populates the *metrics* object on the response json for an impact session:
 
 ``` json
 {
@@ -210,7 +210,7 @@ While similar in most regards, there a couple of differences to note about impac
 The results above come from running an impact analysis on the transactions column of the Location C sample dataset from 5/1/2016-5/10/2016. 
 - **pValue**: Statistical value used to determine the significance of the impact. A small p-value indicates strong evidence of impact, whereas a p-value approaching 0.5 indicates weak evidence of impact. In the example above we have a ambiguous result - which is reasonable given that no known event actually occurred on the dates provided.
 - **absoluteEffect**: Total absolute effect of the event on the dataset. Answers the question, "How much did this event affect my dataset?" During the 10 days of this example impact run, transactions were postively impacted by a 446 transaction increase. This is a relatively strong impact - but again with an ambiguous meaning given the p-value.
-- **relativeEffect**: Percentage effect of the event on the dataset. Answers the question, "By what percentage did this event affect my dataset?". While closely related to the absolute effect, this is a percentage of the mean of all predictions created during an iterative process - not the strict percentage of the absolute against observed or predicted totals within the impact time slice. 
+- **relativeEffect**: Percentage impact of the event on the dataset. Answers the question, "By what percentage did this event affect my dataset?". While closely related to the absolute effect, this is a percentage of the mean of all predictions created during an iterative process - not the strict percentage of the absolute against observed or predicted totals within the impact time slice. 
 
 Developer Notes
 ---

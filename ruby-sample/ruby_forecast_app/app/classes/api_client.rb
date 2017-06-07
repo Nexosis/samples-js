@@ -5,7 +5,7 @@ require 'csv'
 class ApiClient
 	include HTTParty
 	base_uri 'https://ml.nexosis.com/api'
-
+	
 	def initialize(key)
 		@apiKey = key
 		@headers = {"api-key" => @apiKey, "content-type" => "application/json"}
@@ -36,12 +36,22 @@ class ApiClient
 		end
 	end
 
-	def get_session_results(sessionId)
+	def get_session_results(sessionId, as_csv = false)
 		session_result_url = "/sessions/#{sessionId}/results"
+		
 		Rails.cache.fetch(session_result_url) do
+			if as_csv
+				@headers["Accept"] = "text/csv"
+			end
 			response = self.class.get(session_result_url,@options)
+			@headers.delete("Accept")
+
 			if(response.success?)
-				NexosisApi::SessionResult.new(response.parsed_response)
+				if(as_csv)
+					response.body
+				else
+					NexosisApi::SessionResult.new(response.parsed_response)
+				end
 			end
 		end
 	end

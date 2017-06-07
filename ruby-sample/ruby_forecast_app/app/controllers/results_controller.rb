@@ -1,4 +1,5 @@
 class ResultsController < ApplicationController
+
   def index
     params.require(:sessionId)
     client = ApiClient.new(Rails.application.secrets.api_key)
@@ -9,6 +10,15 @@ class ResultsController < ApplicationController
     lastObs =  firstPred - 1
     firstObs = firstPred - 30
     @observations = client.get_dataset(@sessionResult.session.dataSetName, 0, 30, firstObs, lastObs)
+  end
+
+  def file
+    params.require(:sessionId)
+    client = ApiClient.new(Rails.application.secrets.api_key)
+    @sessionResult = client.get_session_results(params[:sessionId], true);
+    filename = "#{params[:sessionId]}.csv"
+    response.headers['Content-Disposition'] = "attachment;filename=#{filename}"
+    render inline: @sessionResult, content_type: 'text/csv'
   end
 
   def champion

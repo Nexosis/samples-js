@@ -7,6 +7,7 @@ Rails.application.routes.draw do
   post 'account/upload'
   get 'results/:sessionId', to: 'results#index'
   get 'results/champion/:dataset_name/:target_column', controller: 'results', action: 'champion'
+  get 'results/file/:sessionId', to: 'results#file'
   get 'account/forecast/:dataset_name', controller: 'account', action: 'forecast'
   get 'account/impact/:dataset_name', controller: 'account', action: 'impact'
   post 'account/forecast/:dataset_name', controller: 'account', action: 'create_forecast'

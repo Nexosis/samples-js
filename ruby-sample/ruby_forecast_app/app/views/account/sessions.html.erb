@@ -13,7 +13,8 @@
       </div>
       <span><a href="/account/session/<%=URI::encode(session.sessionId)%>">See Status</a></span>
       <%if session.statusHistory.select {|v| v.has_value? "completed"}[0].nil? == false %> | 
-      <span><a href="/results/<%=URI::encode(session.sessionId)%>">See Results</a></span>
+      <span><a href="/results/<%=URI::encode(session.sessionId)%>">See Results</a></span> | 
+      <span><a href="/results/file/<%=URI::encode(session.sessionId)%>" Download>Download Results</a></span>
       <%end%>
    </div>
    <% end %>
