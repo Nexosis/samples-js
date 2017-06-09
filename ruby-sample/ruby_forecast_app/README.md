@@ -24,6 +24,7 @@ This application is a simple sample, and therefore relatively straightforward. O
 #### Deployment instructions
 If you have ruby and rails locally, I recommend using an IDE you're comfortable with and running debug mode.  This app has not been written with public deployment in mind and would allow any user to submit jobs to the Nexosis API which cost money - and has not otherwise been tested for performance, security, or anything other than basic function. **It's a sample to learn from - I wouldn't deploy it at all.**
 
+>If you don't have or want Ruby, checkout the [docker folder](https://github.com/Nexosis/samples/tree/master/ruby-sample/docker). You can build a container to run locally.
+
 ##### Comming Soon
-* If you don't have a local environment, a docker compose will be coming soon.
 * The api client is currently embedded into this application. We'll be packaging this as a gem. Once available this application code will be updated to use it.
