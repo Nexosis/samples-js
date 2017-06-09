@@ -1,0 +1,10 @@
+version: '3'
+services:
+  web:
+    build: .
+    image: nexosis/ruby
+    container_name: nexosis_ruby
+    environment:
+      - NEXOSIS_API_KEY
+    ports:
+      - "3000:3000"

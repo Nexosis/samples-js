@@ -1,0 +1,25 @@
+FROM ruby:2.4
+LABEL description="Sample Ruby Rails application for the Nexosis API"
+LABEL maintainer="Nexosis Inc."
+LABEL com.nexosis.tags="ruby,getting started,samples"
+
+RUN apt-get update && apt-get install -y git nodejs
+
+RUN mkdir /app && \
+    mkdir /src && \
+    cd /src && \
+    git clone https://github.com/Nexosis/samples.git
+
+RUN cp -r /src/samples/ruby-sample/ruby_forecast_app/* /app && \
+    cd /app && gem install bundler && \
+    bundle install
+
+ARG NEXOSIS_API_KEY
+
+EXPOSE 3000
+
+ADD ./secrets.yml /app/config/secrets.yml
+
+WORKDIR /app
+
+CMD rails server
