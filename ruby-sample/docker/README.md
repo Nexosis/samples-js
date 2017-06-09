@@ -5,7 +5,7 @@ If you have Docker locally you can build this image using the included compose f
 
 ### Before you compose
 - The secrets file also contains a reference to an environment variable named *NEXOSIS_API_KEY*. Set this environment variable on the host before you compose. The compose file will pick it up and pass it to your container. If you don't want to use an environment variable, just put your key directly in the *secrets.yml* file before you build.
-- 
+
 ### Composing
 Run the following in a command line from the docker files location...
 ``` bash
