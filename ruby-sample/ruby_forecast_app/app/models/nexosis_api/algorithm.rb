@@ -6,7 +6,7 @@ module NexosisApi
            end
         end
 
-        attr_accessor :code
+        attr_accessor :name
         attr_accessor :description
     end
 end

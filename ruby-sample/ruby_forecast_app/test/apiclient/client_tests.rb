@@ -34,10 +34,10 @@ class ApiTest < ActiveSupport::TestCase
             target.upload_dataset_csv fileName,"TestCsvFail"
         end
     end
-
+    
     test "forecast request returns session" do
         target = ApiClient.new(@@apikey)
-        actual = target.create_forecast("GeneratedJson10K", "Column_2", Date.parse("3/1/1958"), Date.parse("5/1/1958"))
+        actual = target.create_session("GeneratedJson10K", "Column_2", Date.parse("3/1/1958"), Date.parse("5/1/1958"))
         assert_not_nil actual
         assert_not_nil actual.session.sessionId
     end

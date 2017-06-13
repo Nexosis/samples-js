@@ -14,8 +14,8 @@ module NexosisApi
            end
         end
 
-        attr_accessor :selectedOn
-        attr_accessor :selectedBySessionId
+        attr_accessor :date
+        attr_accessor :sessionId
         attr_accessor :champion
         attr_accessor :contestants
     end

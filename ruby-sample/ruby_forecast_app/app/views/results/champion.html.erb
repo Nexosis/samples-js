@@ -4,13 +4,13 @@
 <%else%>
 <div class="container">
    <h4>Algorithm Used for Predictions</h4>
-   <h5><%= @champion.winningAlgorithm.champion.algorithm.code %></h5>
-   <p><%= @champion.winningAlgorithm.champion.algorithm.description %></p>
+   <h5><%= @champion.championContest.champion.algorithm.name %></h5>
+   <p><%= @champion.championContest.champion.algorithm.description %></p>
    <div class="row">
       <div class="col-md-4">
          <h4>Metrics</h4>
          <table class="table">
-            <%@champion.winningAlgorithm.champion.metrics.each do |metric|%>
+            <%@champion.championContest.champion.metrics.each do |metric|%>
             <tr>
                <td>
                   <%= metric.code%>
