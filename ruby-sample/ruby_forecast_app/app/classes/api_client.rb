@@ -14,7 +14,7 @@ class ApiClient
 	
 	def get_sessions()
 		session_url = '/sessions'
-		#Rails.cache.fetch(session_url, expires_in: 1.minute) do
+		Rails.cache.fetch(session_url, expires_in: 1.minute) do
 			response = self.class.get(session_url,@options)
 			if(response.success?)
 				sessions = []
@@ -23,23 +23,23 @@ class ApiClient
 				}
 				sessions
 			end
-		#end
+		end
 	end
 
 	def get_session(sessionId)
 		session_url = "/sessions/#{sessionId}"
-		#Rails.cache.fetch(session_url, expires_in: 30.second) do
+		Rails.cache.fetch(session_url, expires_in: 30.second) do
 			response = self.class.get(session_url,@options)
 			if(response.success?)
 				NexosisApi::Session.new(response.parsed_response)
 			end
-		#end
+		end
 	end
 
 	def get_session_results(sessionId, as_csv = false)
 		session_result_url = "/sessions/#{sessionId}/results"
 		
-		#Rails.cache.fetch(session_result_url) do
+		Rails.cache.fetch(session_result_url) do
 			if as_csv
 				@headers["Accept"] = "text/csv"
 			end
@@ -53,27 +53,27 @@ class ApiClient
 					NexosisApi::SessionResult.new(response.parsed_response)
 				end
 			end
-		#end
+		end
 	end
 
 	def get_account_balance
 		session_url = '/sessions'
-		#Rails.cache.fetch(session_url + '_balance', expires_in: 2.minute) do
+		Rails.cache.fetch(session_url + '_balance', expires_in: 2.minute) do
 			response = self.class.get(session_url,@options)
 			response.headers["nexosis-account-balance"]
-		#end
+		end
 	end
 
 	def get_datasets
 		dataset_url = "/data"
-		#Rails.cache.fetch(dataset_url) do
+		Rails.cache.fetch(dataset_url) do
 			response = self.class.get(dataset_url, @options)
 			if(response.success?)
 				response.parsed_response["items"]
 			else 
 				"Failure: #{response.parsed_response['message']}"
 			end
-		#end
+		end
 	end
 	
 	def get_dataset(dataSetName, page = 0, page_size = 30, start_date = nil, end_date = nil)
@@ -86,7 +86,7 @@ class ApiClient
 		}
 		response = self.class.get(dataset_query_url,:headers => @headers, :query => query)
 		if(response.success?)
-			#Rails.cache.write(dataset_query_url + query.inspect, response.parsed_response["data"])
+			Rails.cache.write(dataset_query_url + query.inspect, response.parsed_response["data"])
 			response.parsed_response["data"]
 		end
 	end
@@ -139,12 +139,12 @@ class ApiClient
 
 	def get_forecast_model(dataset_name,target_column)
 		model_url = "/data/#{dataset_name}/forecast/model/#{target_column}"
-		#Rails.cache.fetch(model_url) do
+		Rails.cache.fetch(model_url) do
 		response = self.class.get(model_url,@options)
 			if(response.success?)
 				NexosisApi::DatasetModel.new(response.parsed_response)
 			end
-		#end
+		end
 	end
 		private
 	def verify_response?(http_response)
