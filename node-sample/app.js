@@ -4,6 +4,7 @@ const util = require('util');
 
 const rootUrl = "https://ml.nexosis.com/api/";
 
+
 const key = process.env.NEXOSIS_API_KEY;
 
 if(!key) {
@@ -15,7 +16,11 @@ const client = new Client();
 const action = process.argv[2] || "lastsession";
 
 if(action === "forecast") {
-    postPredictionJob(dumpResponse);
+    let interval = 'day';
+    if(process.argv.length >= 4) {
+        interval = process.argv[3];
+    }
+    postPredictionJob(interval, dumpResponse);
 }
 
 if(action === "sessions") {
@@ -32,6 +37,14 @@ if(action === "lastsession") {
 
 if(action === "results") {
     getSessions(data=> getResultsForLastSession(data));
+}
+
+if(action === "getforecast") {
+    getForecast(process.argv[3], dumpResponse);
+}
+
+if(action === "model") {
+    getModel(process.argv[3], dumpResponse);
 }
 
 if(action == "put") {
@@ -55,6 +68,9 @@ if(action === "data") {
 
 function dumpResponse(data, response) {
     console.log(response.headers);
+    if(response.statusCode !== 200) {
+        console.log(response);
+    }
     console.log(util.inspect(data, false, null));
 }
 
@@ -76,13 +92,13 @@ function getSession(id, callback) {
 }
 
 function getLastSession(sessions) {
-    const session = sessions.results[sessions.results.length-1];
+    const session = sessions.items[sessions.items.length-1];
     getSession(session.sessionId, dumpResponse);
     
 }
 
 function getResultsForLastSession(sessions) {
-    const session = sessions.results[sessions.results.length-1].sessionId;
+    const session = sessions.items[sessions.items.length-1].sessionId;
     getSessionResults(session, dumpResponse);
 }
 
@@ -94,9 +110,9 @@ function defaultArgs() {
 }
 
 
-function fakeData() {
+function fakeData(interval) {
     let data = {data: []};
-    let start = moment.utc().startOf('day');
+    let start = moment.utc().startOf(interval);
 
     let mult = 1;
     const WAVE_MAGNITUDE = 20;
@@ -105,16 +121,20 @@ function fakeData() {
             mult *= -1;
         }
         var point = (i % WAVE_MAGNITUDE) * mult;
-        data.data.push({timestamp: start.subtract(1, 'days').format(), values: {foo : 100 + point, bar: 200 + point }});
+        data.data.push({timestamp: start.subtract(1, `${interval}s`).format(), values: {foo : 100 + point, bar: 200 + point }});
     }
     return data;
 }
 
-function postPredictionJob(callback) {
+function postPredictionJob(interval, callback) {
     var args = defaultArgs();
-    args.data = fakeData();
+    args.data = fakeData(interval);
 
-    client.post(`${rootUrl}sessions/forecast?predictionStartDate=2017-05-12&predictionEndDate=2017-07-01&targetColumn=foo`, args, function (data, response) {
+    let start = moment.utc().startOf(interval);
+    let end = moment.utc().startOf(interval).add(30, `${interval}s`);
+
+
+    client.post(`${rootUrl}sessions/forecast?startDate=${start.toISOString()}&endDate=${end.toISOString()}&targetColumn=foo&resultInterval=${interval}`, args, function (data, response) {
     	callback(data, response);
     });
 }
@@ -129,6 +149,22 @@ function getSessions(callback) {
 function getSessionResults(id, callback) {
     var args = defaultArgs();
     client.get(`${rootUrl}sessions/${id}/results`, args, function(data, response) {
+        callback(data, response);
+    });
+}
+
+function getModel(dataSetName, callback) {
+    var args = defaultArgs();
+    let url = `${rootUrl}data/${dataSetName}/forecast/model`;
+    client.get(url, args, function(data, response) {
+        callback(data, response);
+    });
+}
+
+function getForecast(dataSetName, callback) {
+    var args = defaultArgs();
+    let url = `${rootUrl}data/${dataSetName}/forecast`;
+    client.get(url, args, function(data, response) {
         callback(data, response);
     });
 }
