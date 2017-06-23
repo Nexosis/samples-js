@@ -5,6 +5,7 @@ const util = require('util');
 const rootUrl = "https://ml.nexosis.com/api/";
 
 
+
 const key = process.env.NEXOSIS_API_KEY;
 
 if(!key) {
