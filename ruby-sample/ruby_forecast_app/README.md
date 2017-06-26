@@ -6,6 +6,7 @@ This application is a simple sample, and therefore relatively straightforward. O
 * **Ruby version** - _2.4.1p111 (2017-03-22 revision 58053)_
 
 * **Application dependencies** - 
+	* Nexosis API Gem (nexosis_api)
 	* NVD3 charting for results page
 	* Bootstrap for basic styling
 	* Httparty for making api requests in api_client
@@ -15,10 +16,7 @@ This application is a simple sample, and therefore relatively straightforward. O
 
 * **Database creation** - _This application does not use a database - but the default rails setup of sqlite has been retained._
 
-* **How to run the test suite** - _pretty light on tests, but the api_client tests can be run by calling:_
- ```bash
- rake test TEST=test/apiclient/client_tests.rb
- ```
+* **Tests** - Nothing in this projects right now. There are a slew of tests of the client [in that project](https://github.com/Nexosis/nexosisclient-rb)
 
 
 #### Deployment instructions
@@ -26,5 +24,3 @@ If you have ruby and rails locally, I recommend using an IDE you're comfortable 
 
 >If you don't have or want Ruby, checkout the [docker folder](https://github.com/Nexosis/samples/tree/master/ruby-sample/docker). You can build a container to run locally.
 
-##### Comming Soon
-* The api client is currently embedded into this application. We'll be packaging this as a gem. Once available this application code will be updated to use it.
