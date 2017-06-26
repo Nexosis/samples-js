@@ -8,9 +8,9 @@ Rails.application.routes.draw do
   get 'results/:sessionId', to: 'results#index'
   get 'results/champion/:dataset_name/:target_column', controller: 'results', action: 'champion'
   get 'results/file/:sessionId', to: 'results#file'
-  get 'account/forecast/:dataset_name', controller: 'account', action: 'forecast'
-  get 'account/impact/:dataset_name', controller: 'account', action: 'impact'
-  post 'account/forecast/:dataset_name', controller: 'account', action: 'create_forecast'
-  post 'account/impact/:dataset_name', controller: 'account', action: 'create_impact'
+  get 'account/forecast/:dataset_name', controller: 'account', action: 'forecast', :constraints => { :dataset_name => /[^\/]+/ }
+  get 'account/impact/:dataset_name', controller: 'account', action: 'impact', :constraints => { :dataset_name => /[^\/]+/ }
+  post 'account/forecast/:dataset_name', controller: 'account', action: 'create_forecast', :constraints => { :dataset_name => /[^\/]+/ }
+  post 'account/impact/:dataset_name', controller: 'account', action: 'create_impact', :constraints => { :dataset_name => /[^\/]+/ }
   # For details on the DSL available within this file, see http://guides.rubyonrails.org/routing.html
 end

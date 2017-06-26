@@ -1,4 +1,5 @@
-require 'api_client'
+require 'nexosis_api'
+require 'csv'
 
 class AccountController < ApplicationController
 	def index
@@ -6,36 +7,33 @@ class AccountController < ApplicationController
 		if(params["uploaded"])
 			@uploadMessage = "Your dataset has been uploaded."
 		end
-		
-		client = ApiClient.new(Rails.application.secrets.api_key)
-		@account_balance = client.get_account_balance
-		@datasets = client.get_datasets
+
+		@account_balance = @api_client.get_account_balance
+		@datasets = @api_client.list_datasets
 		render
 	end
 
 	def sessions
-		client = ApiClient.new(Rails.application.secrets.api_key)
-		@sessions = client.get_sessions()
+		@sessions = @api_client.list_sessions
 		render
 	end
 
 	def session_status
 		params.require(:session_id)
-		client = ApiClient.new(Rails.application.secrets.api_key)
-		@session = client.get_session params["session_id"]
+		@session = @api_client.get_session(params["session_id"])
 		render "session"
 	end
 
 	def upload
 		uploaded_io = params["datafile"]
-		dataset = params["dataset_name"]
+		dataset_name = params["dataset_name"]
 		File.open(Rails.root.join('public', 'uploads', uploaded_io.original_filename), 'wb') do |file|
 			file.write(uploaded_io.read)
 		end
-		client = ApiClient.new(Rails.application.secrets.api_key)
+		csv = CSV.open(Rails.root.join('public', 'uploads', uploaded_io.original_filename), 'rb', headers: true)
 		begin
-			client.upload_dataset_csv Rails.root.join('public', 'uploads', uploaded_io.original_filename), dataset
-		rescue HttpException => http_error
+			@api_client.create_dataset_csv(dataset_name, csv)
+		rescue NexosisApi::HttpException => http_error
 			@error_message = http_error.message
 			render
 			return
@@ -54,11 +52,14 @@ class AccountController < ApplicationController
 		params.require(:start_date)
 		params.require(:end_date)
 		params.permit(:is_estimate)
-		client = ApiClient.new(Rails.application.secrets.api_key)
 		estimate_only = params["is_estimate"] == "on" ? true : false
 		begin
-			@forecast_result = client.create_session params["dataset_name"], params["target_column"], params["start_date"], params["end_date"], estimate_only
-		rescue HttpException => http_error
+			if(estimate_only)		
+				@forecast_result = @api_client.estimate_forecast_session params["dataset_name"], params["target_column"], params["start_date"], params["end_date"]
+			else	
+				@forecast_result = @api_client.create_forecast_session params["dataset_name"], params["target_column"], params["start_date"], params["end_date"]
+			end
+		rescue NexosisApi::HttpException => http_error
 			@error = http_error
 		end
 		render "forecast"
@@ -76,12 +77,15 @@ class AccountController < ApplicationController
 		params.require(:end_date)
 		params.require(:event_name)
 		params.permit(:is_estimate)
-		client = ApiClient.new(Rails.application.secrets.api_key)
 		estimate_only = params["is_estimate"] == "on" ? true : false
 		@event_name = params["event_name"]
 		begin
-			@impact_result = client.create_session params["dataset_name"], params["target_column"], params["start_date"], params["end_date"], estimate_only , params["event_name"], "impact"
-		rescue HttpException => http_error
+			if(estimate_only)
+				@impact_result = @api_client.estimate_impact_session(params["dataset_name"], params["target_column"], params["start_date"], params["end_date"] , params["event_name"])
+			else
+				@impact_result = @api_client.create_impact_session(params["dataset_name"], params["target_column"], params["start_date"], params["end_date"] , params["event_name"])
+			end
+		rescue NexosisApi::HttpException => http_error
 			@error = http_error
 		end
 		render "impact"

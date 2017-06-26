@@ -17,7 +17,7 @@
     <%else%>
     <% @datasets.each do |ds| %>
         <div>
-        <%= ds["dataSetName"] %> <a href="/account/forecast/<%= URI::encode(ds["dataSetName"]) %>">Begin Forecast</a>  | <a href="/account/impact/<%= URI::encode(ds["dataSetName"]) %>">Begin Impact Analysis</a>
+        <%= ds.dataset_name %> <a href="/account/forecast/<%= URI::encode(ds.dataset_name) %>">Begin Forecast</a>  | <a href="/account/impact/<%= URI::encode(ds.dataset_name) %>">Begin Impact Analysis</a>
         </div>
     <% end %>
     <%end%>

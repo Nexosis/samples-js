@@ -3,26 +3,22 @@
 <script src="https://d3js.org/d3.v3.min.js"></script>
 <script src="https://cdn.rawgit.com/novus/nvd3/v1.8.1/build/nv.d3.min.js"></script>
 <%end%>
-<h1>Session Information for <%= @sessionResult.session.sessionId %></h1>
-<p class="lead">Dataset used: <%=@sessionResult.session.dataSetName%></p>
+<h1>Session Information for <%= @sessionResult.sessionId %></h1>
+<p class="lead">Dataset used: <%=@sessionResult.dataSetName%></p>
 <div class="row">
     <h5>Session Type:</h5>
-    <div class="col-sm-3"><%=@sessionResult.session.type%></div>
+    <div class="col-sm-3"><%=@sessionResult.type%></div>
 </div>
 <div class="row">
-   <h5><%= @sessionResult.session.type == "forecast" ? "Prediction" : "Impact Event " %> Range:</h5>
-   <div class="col-sm-3">Start Date: <%= Date.rfc3339(@sessionResult.session.startDate).strftime("%m/%d/%Y %I:%M%p") %></div>
-   <div class="col-sm-3">End Date: <%= Date.rfc3339(@sessionResult.session.endDate).strftime("%m/%d/%Y %I:%M%p")%></div>
+   <h5><%= @sessionResult.type == "forecast" ? "Prediction" : "Impact Event " %> Range:</h5>
+   <div class="col-sm-3">Start Date: <%= Date.rfc3339(@sessionResult.startDate).strftime("%m/%d/%Y %I:%M%p") %></div>
+   <div class="col-sm-3">End Date: <%= Date.rfc3339(@sessionResult.endDate).strftime("%m/%d/%Y %I:%M%p")%></div>
 </div>
 <div class="row">
    <h5>Target Column:</h5>
-   <div class="col-sm-3"><%=@sessionResult.session.targetColumn%></div>
+   <div class="col-sm-3"><%=@sessionResult.targetColumn%></div>
 </div>
-<%if @sessionResult.session.type == "forecast"%>
-<div class="row">
-   <div class="col-sm-3"><a href="/results/champion/<%=URI::encode(@sessionResult.session.dataSetName.gsub(/[.]/,'%2E'))%>/<%=URI::encode(@sessionResult.session.targetColumn)%>">See prediction run details</a></div>
-</div>
-<%else%>
+<%if @sessionResult.type == "impact"%>
 <div class="col-sm-4">
 <div class="row"><label>pValue: </label><%= @sessionResult.metrics.pValue %></div>
 <div class="row"><label>Absolute Effect: </label><%= @sessionResult.metrics.absoluteEffect %></div>
@@ -72,11 +68,12 @@
 
 <script type="text/javascript">
 $(document).ready(function(){
-   var observationData = <%= render inline: @observations.to_json%>;
+   var observations = <%= render inline: @observations.to_json%>;
+   var observationData = observations.data;
    var predictionData = <%= render inline: @sessionResult.data.to_json%>;
    var obsValues = [];
    var predValues = [];
-   dataKey = "<%=@sessionResult.session.targetColumn%>";
+   dataKey = "<%=@sessionResult.targetColumn%>";
    
    var table = document.getElementById("dataTable");
    for (var i = 0; i < predictionData.length; i++) 

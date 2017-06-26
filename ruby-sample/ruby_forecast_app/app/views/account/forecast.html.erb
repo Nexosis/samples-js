@@ -1,11 +1,11 @@
-<%if @forecast_result.nil? == false && @forecast_result.session.status != "estimated"%>
+<%if @forecast_result.nil? == false && @forecast_result.status != "estimated"%>
     <div class="alert alert-success">
         <%= "Your forecast request has been submitted. This job cost $#{@forecast_result.cost}. Your remaining balance is now $#{@forecast_result.account_balance}." %>
         <div>
-            <a href="/account/forecast/<%= @forecast_result.session.dataSetName %>">Submit another session</a>
+            <a href="/account/forecast/<%= @forecast_result.dataSetName %>">Submit another session</a>
             </div>
             <div>
-            <a href="/account/session/<%= @forecast_result.session.sessionId %>">See session status</a>
+            <a href="/account/session/<%= @forecast_result.sessionId %>">See session status</a>
         </div>
     </div>
 <%else%>
@@ -17,7 +17,7 @@
             </div>
         </div>
     <%end%>
-    <%if @forecast_result.nil? == false && @forecast_result.session.status == "estimated"%>
+    <%if @forecast_result.nil? == false && @forecast_result.status == "estimated"%>
     <div class="row">
         <div class="alert alert-success">
             This job will cost $<%=@forecast_result.cost%>.
@@ -25,17 +25,17 @@
     </div>
     <%end%>
     <div class="row">
-    <h4>Create a new forecast session for <%= @dataset_name %><%= @forecast_result.session.dataSetName unless @forecast_result.nil? %></h4>
+    <h4>Create a new forecast session for <%= @dataset_name %><%= @forecast_result.dataSetName unless @forecast_result.nil? %></h4>
         <%= form_tag({action: :create_forecast}) do %>  
             <input type="hidden" name="dataset_name" value="<%= @dataset_name %>">
             <div>
-                <label for="target_column">Column to predict: </label><input type="text" name="target_column" value="<%= @forecast_result.session.targetColumn unless @forecast_result.nil? %>">
+                <label for="target_column">Column to predict: </label><input type="text" name="target_column" value="<%= @forecast_result.targetColumn unless @forecast_result.nil? %>">
             </div>
             <div>
-                <label for="start_date">Prediction Start Date: </label><input type="text" name="start_date" value="<%= @forecast_result.session.startDate unless @forecast_result.nil? %>">
+                <label for="start_date">Prediction Start Date: </label><input type="text" name="start_date" value="<%= @forecast_result.startDate unless @forecast_result.nil? %>">
             </div>
             <div>
-                <label for="end_date">Prediction End Date: </label><input type="text" name="end_date" value="<%= @forecast_result.session.endDate unless @forecast_result.nil? %>">
+                <label for="end_date">Prediction End Date: </label><input type="text" name="end_date" value="<%= @forecast_result.endDate unless @forecast_result.nil? %>">
             </div>
             <div>
                 <label for="is_estimate">Estimate Only</label><input type="checkbox" name="is_estimate"/>
