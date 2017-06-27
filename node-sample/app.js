@@ -1,9 +1,9 @@
 const Client = require('node-rest-client').Client;
 const moment = require('moment');
 const util = require('util');
+const Series = require('time-series-data-generator');
 
-const rootUrl = "https://ml.nexosis.com/api/";
-
+const rootUrl = "https://ml.nexosis.com/v1/";
 
 
 const key = process.env.NEXOSIS_API_KEY;
@@ -113,17 +113,23 @@ function defaultArgs() {
 
 function fakeData(interval) {
     let data = {data: []};
-    let start = moment.utc().startOf(interval);
+    let until = moment.utc().startOf(interval);
+    let from = moment.utc().startOf(interval).subtract(100, `${interval}s`);
 
-    let mult = 1;
-    const WAVE_MAGNITUDE = 20;
-    for(var i = 0; i < 100; i++) {
-        if((i % WAVE_MAGNITUDE) === 0) {
-            mult *= -1;
-        }
-        var point = (i % WAVE_MAGNITUDE) * mult;
-        data.data.push({timestamp: start.subtract(1, `${interval}s`).format(), values: {foo : 100 + point, bar: 200 + point }});
+    var duration = moment.duration(1, `${interval}s`).asSeconds();
+
+    var series = new Series({ from: from.toISOString(), until: until.toISOString(), interval: duration, keyName: "foo"});
+    var seriesBar = series.clone({keyName: "bar"});
+
+    var opts = {coefficient: 40, constant: 50,  decimalDigits: 0, period: duration*10};
+
+    var barData = seriesBar.cos(opts)
+    data.data = series.sin(opts);
+
+    for(let i = 0; i < data.data.length; i++) {
+        data.data[i].bar = barData[i].bar;
     }
+
     return data;
 }
 
@@ -133,10 +139,9 @@ function postPredictionJob(interval, callback) {
 
     let start = moment.utc().startOf(interval);
     let end = moment.utc().startOf(interval).add(30, `${interval}s`);
-
-
+    
     client.post(`${rootUrl}sessions/forecast?startDate=${start.toISOString()}&endDate=${end.toISOString()}&targetColumn=foo&resultInterval=${interval}`, args, function (data, response) {
-    	callback(data, response);
+    callback(data, response);
     });
 }
 
