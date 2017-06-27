@@ -2,15 +2,18 @@ const Client = require('node-rest-client').Client;
 const moment = require('moment');
 const util = require('util');
 const Series = require('time-series-data-generator');
+const csv = require('csv');
+const fs = require('fs');
 
 const rootUrl = "https://ml.nexosis.com/v1/";
-
 
 const key = process.env.NEXOSIS_API_KEY;
 
 if(!key) {
     throw new Error("NEXOSIS_API_KEY environment variable must be set");
 }
+
+const devNull = err=> {};
 
 const client = new Client();
 
@@ -37,7 +40,13 @@ if(action === "lastsession") {
 }
 
 if(action === "results") {
-    getSessions(data=> getResultsForLastSession(data));
+    let csvPath = undefined;
+    
+    if(process.argv.length >= 4) {
+        csvPath = process.argv[3];
+    }
+
+    getSessions(data=> getResultsForLastSession(data, csvPath));
 }
 
 if(action === "getforecast") {
@@ -62,7 +71,12 @@ if(action === "data") {
         listDataSets(dumpResponse);
     }
     else {
-        getData(process.argv[3], process.argv[4], dumpResponse);
+        let csvPath = undefined;
+        if(process.argv.length >= 5) {
+            csvPath = process.argv[4];
+        }
+        console.log(process.argv, csvPath, process.argv.length);
+        getData(process.argv[3], dumpResponse, csvPath);
     }
     
 }
@@ -98,9 +112,9 @@ function getLastSession(sessions) {
     
 }
 
-function getResultsForLastSession(sessions) {
+function getResultsForLastSession(sessions, csvPath) {
     const session = sessions.items[sessions.items.length-1].sessionId;
-    getSessionResults(session, dumpResponse);
+    getSessionResults(session, dumpResponse, csvPath);
 }
 
 function defaultArgs() {
@@ -152,10 +166,15 @@ function getSessions(callback) {
     });
 }
 
-function getSessionResults(id, callback) {
+
+
+function getSessionResults(id, callback, csvPath) {
     var args = defaultArgs();
     client.get(`${rootUrl}sessions/${id}/results`, args, function(data, response) {
         callback(data, response);
+        if(csvPath) {
+            csv.stringify(data.data, {header: true}, (err,csvData)=>fs.writeFile(csvPath,csvData, devNull));
+        }
     });
 }
 
@@ -175,14 +194,14 @@ function getForecast(dataSetName, callback) {
     });
 }
 
-function getData(dataSetName, queryString, callback) {
+function getData(dataSetName, callback, csvPath) {
     var args = defaultArgs();
     let url = `${rootUrl}data/${dataSetName}`;
-    if(args) {
-        url = `${url}?${queryString}`;
-    }
     client.get(url, args, function(data, response) {
         callback(data, response);
+        if(csvPath) {
+            csv.stringify(data.data, {header: true},  (err,csvData)=>fs.writeFile(csvPath,csvData, devNull));
+        }
     });
 }
 

@@ -13,6 +13,7 @@
   "author": "Craig Vermeer",
   "license": "MIT",
   "dependencies": {
+    "csv": "^1.1.1",
     "moment": "^2.18.1",
     "node-rest-client": "^3.1.0",
     "time-series-data-generator": "^0.1.4"
