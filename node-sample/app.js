@@ -7,6 +7,7 @@ const fs = require('fs');
 
 const rootUrl = "https://ml.nexosis.com/v1/";
 
+
 const key = process.env.NEXOSIS_API_KEY;
 
 if(!key) {
@@ -127,8 +128,8 @@ function defaultArgs() {
 
 function fakeData(interval) {
     let data = {data: []};
-    let until = moment.utc().startOf(interval);
-    let from = moment.utc().startOf(interval).subtract(100, `${interval}s`);
+    let until = moment.utc().startOf(interval).subtract(1, `${interval}s`);
+    let from = moment.utc().startOf(interval).subtract(1, `${interval}s`).subtract(100, `${interval}s`);
 
     var duration = moment.duration(1, `${interval}s`).asSeconds();
 
