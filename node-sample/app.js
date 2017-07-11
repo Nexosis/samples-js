@@ -22,10 +22,18 @@ const action = process.argv[2] || "lastsession";
 
 if(action === "forecast") {
     let interval = 'day';
+    let dataSet = 'foo';
     if(process.argv.length >= 4) {
-        interval = process.argv[3];
+        dataSet = process.argv[3];
     }
-    postPredictionJob(interval, dumpResponse);
+
+    if(process.argv.length >= 5) {
+        interval = process.argv[4];
+    }
+
+    deleteData(dataSet);
+    putData(dataSet, interval)
+    postPredictionJob(dataSet, interval, dumpResponse);
 }
 
 if(action === "sessions") {
@@ -63,8 +71,8 @@ if(action == "put") {
     if(process.argv.length >= 4) {
         name = process.argv[3];
     }
-
-    putData(name, dumpResponse);
+    deleteData(dataSet);
+    putData(name, 'day', dumpResponse);
 }
 
 if(action === "data") {
@@ -90,12 +98,22 @@ function dumpResponse(data, response) {
     console.log(util.inspect(data, false, null));
 }
 
-function putData(name, callback) {
+function deleteData(name) {
     let args = defaultArgs();
-    args.data = fakeData();
+    
+    client.delete(`${rootUrl}data/${name}`, args, function(data, response) {
+    });
+
+}
+
+function putData(name, interval, callback) {
+    let args = defaultArgs();
+    args.data = fakeData(interval);
 
     client.put(`${rootUrl}data/${name}`, args, function(data, response) {
-        callback(data, response);
+        if(callback) {
+            callback(data, response);
+        }
     });
 
 }
@@ -148,14 +166,13 @@ function fakeData(interval) {
     return data;
 }
 
-function postPredictionJob(interval, callback) {
+function postPredictionJob(dataSet, interval, callback) {
     var args = defaultArgs();
-    args.data = fakeData(interval);
 
     let start = moment.utc().startOf(interval);
     let end = moment.utc().startOf(interval).add(30, `${interval}s`);
     
-    client.post(`${rootUrl}sessions/forecast?startDate=${start.toISOString()}&endDate=${end.toISOString()}&targetColumn=foo&resultInterval=${interval}`, args, function (data, response) {
+    client.post(`${rootUrl}sessions/forecast?dataSetName=${dataSet}&startDate=${start.toISOString()}&endDate=${end.toISOString()}&targetColumn=foo&resultInterval=${interval}`, args, function (data, response) {
     callback(data, response);
     });
 }
