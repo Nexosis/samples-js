@@ -71,7 +71,7 @@ if(action == "put") {
     if(process.argv.length >= 4) {
         name = process.argv[3];
     }
-    deleteData(dataSet);
+    deleteData(name);
     putData(name, 'day', dumpResponse);
 }
 
