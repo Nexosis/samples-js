@@ -1,12 +1,9 @@
-const Client = require('node-rest-client').Client;
+const nexosisClient = require('nexosis-api-client').default;
 const moment = require('moment');
 const util = require('util');
 const Series = require('time-series-data-generator');
 const csv = require('csv');
 const fs = require('fs');
-
-const rootUrl = "https://ml.nexosis.com/v1/";
-
 
 const key = process.env.NEXOSIS_API_KEY;
 
@@ -16,7 +13,7 @@ if(!key) {
 
 const devNull = err=> {};
 
-const client = new Client();
+const client = new nexosisClient({key: process.env.NEXOSIS_API_KEY});
 
 const action = process.argv[2] || "lastsession";
 
@@ -90,39 +87,22 @@ if(action === "data") {
     
 }
 
-function dumpResponse(data, response) {
-    console.log(response.headers);
-    if(response.statusCode !== 200) {
-        console.log(response);
-    }
+function dumpResponse(data) {
     console.log(util.inspect(data, false, null));
 }
 
 function deleteData(name) {
-    let args = defaultArgs();
-    
-    client.delete(`${rootUrl}data/${name}`, args, function(data, response) {
-    });
-
+    client.DataSets.remove(name);
 }
 
 function putData(name, interval, callback) {
-    let args = defaultArgs();
-    args.data = fakeData(interval);
+    var data = fakeData(interval);
 
-    client.put(`${rootUrl}data/${name}`, args, function(data, response) {
-        if(callback) {
-            callback(data, response);
-        }
-    });
-
+    client.DataSets.create(name, data).then(callback);
 }
 
 function getSession(id, callback) {
-    let args = defaultArgs();
-    client.get(`${rootUrl}sessions/${id}`, args, function(data, response) {
-        callback(data, response);
-    });
+    client.Sessions.get(id).then(callback);
 }
 
 function getLastSession(sessions) {
@@ -135,14 +115,6 @@ function getResultsForLastSession(sessions, csvPath) {
     const session = sessions.items[sessions.items.length-1].sessionId;
     getSessionResults(session, dumpResponse, csvPath);
 }
-
-function defaultArgs() {
-    var args = {
-        headers: { "api-key": key, "Content-Type": "application/json" },
-    };
-    return args;
-}
-
 
 function fakeData(interval) {
     let data = {data: []};
@@ -167,65 +139,31 @@ function fakeData(interval) {
 }
 
 function postPredictionJob(dataSet, interval, callback) {
-    var args = defaultArgs();
 
     let start = moment.utc().startOf(interval);
     let end = moment.utc().startOf(interval).add(30, `${interval}s`);
-    
-    client.post(`${rootUrl}sessions/forecast?dataSetName=${dataSet}&startDate=${start.toISOString()}&endDate=${end.toISOString()}&targetColumn=foo&resultInterval=${interval}`, args, function (data, response) {
-    callback(data, response);
-    });
+
+    client.Sessions.createForecast(dataSet, start, end, 'foo', interval).then(callback);
 }
 
 function getSessions(callback) {
     var args = defaultArgs();
-    client.get(`${rootUrl}sessions`, args, function(data, response) {
-        callback(data, response);
-    });
+
+    client.Sessions.list().then(callback);
 }
 
 
 
-function getSessionResults(id, callback, csvPath) {
-    var args = defaultArgs();
-    client.get(`${rootUrl}sessions/${id}/results`, args, function(data, response) {
-        callback(data, response);
-        if(csvPath) {
-            csv.stringify(data.data, {header: true}, (err,csvData)=>fs.writeFile(csvPath,csvData, devNull));
-        }
-    });
+function getSessionResults(id, callback) {
+    
+    client.Sessions.Get(id).then(callback);
+
 }
 
-function getModel(dataSetName, callback) {
-    var args = defaultArgs();
-    let url = `${rootUrl}data/${dataSetName}/forecast/model`;
-    client.get(url, args, function(data, response) {
-        callback(data, response);
-    });
-}
-
-function getForecast(dataSetName, callback) {
-    var args = defaultArgs();
-    let url = `${rootUrl}data/${dataSetName}/forecast`;
-    client.get(url, args, function(data, response) {
-        callback(data, response);
-    });
-}
-
-function getData(dataSetName, callback, csvPath) {
-    var args = defaultArgs();
-    let url = `${rootUrl}data/${dataSetName}`;
-    client.get(url, args, function(data, response) {
-        callback(data, response);
-        if(csvPath) {
-            csv.stringify(data.data, {header: true},  (err,csvData)=>fs.writeFile(csvPath,csvData, devNull));
-        }
-    });
+function getData(dataSetName, callback) {
+    client.DataSets.get(dataSetName).then(callback);
 }
 
 function listDataSets(callback) {
-    var args = defaultArgs();
-    client.get(`${rootUrl}data`, args, function(data, response) {
-        callback(data, response);
-    });
+    client.DataSets.list().then(callback);
 }

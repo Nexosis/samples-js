@@ -1,21 +1,21 @@
 {
-  "name": "node-api-client",
+  "name": "node-api-sample",
   "version": "1.0.0",
-  "description": "A sample client for Axon in nodejs",
+  "description": "A sample that uses the nexosis javascript client",
   "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
-    "url": "git@www.nexosisdev.com:tinker/node-api-client.git"
+    "url": "https://github.com/Nexosis/samples.git"
   },
   "author": "Craig Vermeer",
   "license": "MIT",
   "dependencies": {
     "csv": "^1.1.1",
     "moment": "^2.18.1",
-    "node-rest-client": "^3.1.0",
+    "nexosis-api-client": "^1.0.0",
     "time-series-data-generator": "^0.1.4"
   }
 }
