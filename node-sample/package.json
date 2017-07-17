@@ -15,6 +15,7 @@
   "dependencies": {
     "csv": "^1.1.1",
     "moment": "^2.18.1",
+    "nexosis-api-client": "^1.0.1",
     "time-series-data-generator": "^0.1.4"
   }
 }
