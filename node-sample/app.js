@@ -28,39 +28,35 @@ if(action === "forecast") {
         interval = process.argv[4];
     }
 
-    deleteData(dataSet);
-    putData(dataSet, interval)
-    postPredictionJob(dataSet, interval, dumpResponse);
+    client.DataSets.remove(dataSet)
+        .then(()=> {return putData(dataSet, interval)})
+        .then(() => {return postPredictionJob(dataSet, interval)})
+        .then(data=>dumpResponse(data))
+        .catch(writeError);
 }
 
 if(action === "sessions") {
-    getSessions(dumpResponse);
+    client.Sessions.list().then(dumpResponse).catch(writeError);
 }
 
 if(action === "getsession") {
-    getSession(process.argv[3], dumpResponse);
+    client.Sessions.get(process.argv[3]).then(dumpResponse).catch(writeError);
 }
 
 if(action === "lastsession") {
-    getSessions(data=> getLastSession(data));
+    client.Sessions.list()
+        .then(sessions=>{return sessions.items[sessions.items.length-1];})
+        .then(session=> {return client.Sessions.get(session.sessionId);})
+        .then(dumpResponse)
+        .catch(writeError);
 }
 
 if(action === "results") {
-    let csvPath = undefined;
-    
-    if(process.argv.length >= 4) {
-        csvPath = process.argv[3];
-    }
-
-    getSessions(data=> getResultsForLastSession(data, csvPath));
-}
-
-if(action === "getforecast") {
-    getForecast(process.argv[3], dumpResponse);
-}
-
-if(action === "model") {
-    getModel(process.argv[3], dumpResponse);
+    client.Sessions.list()
+        .then(sessions=>{return sessions.items[sessions.items.length-1];})
+        .then(session=> {return client.Sessions.results(session.sessionId);})
+        .then(dumpResponse)
+        .catch(writeError);
 }
 
 if(action == "put") {
@@ -68,21 +64,23 @@ if(action == "put") {
     if(process.argv.length >= 4) {
         name = process.argv[3];
     }
-    deleteData(name);
-    putData(name, 'day', dumpResponse);
+    client.DataSets.remove(name);
+    putData(name, 'day')
+        .then(dumpResponse)
+        .catch(writeError);
 }
 
 if(action === "data") {
+
     if(process.argv.length < 4) {
-        listDataSets(dumpResponse);
+        client.DataSets.list()
+            .then(dumpResponse)
+            .catch(writeError);
     }
     else {
-        let csvPath = undefined;
-        if(process.argv.length >= 5) {
-            csvPath = process.argv[4];
-        }
-        console.log(process.argv, csvPath, process.argv.length);
-        getData(process.argv[3], dumpResponse, csvPath);
+        client.DataSets.get(process.argv[3])
+            .then(dumpResponse)
+            .catch(writeError);
     }
     
 }
@@ -91,29 +89,15 @@ function dumpResponse(data) {
     console.log(util.inspect(data, false, null));
 }
 
-function deleteData(name) {
-    client.DataSets.remove(name);
+function writeError(err) {
+    console.log(err);
 }
 
-function putData(name, interval, callback) {
+function putData(name, interval) {
+    console.log('putting');
     var data = fakeData(interval);
 
-    client.DataSets.create(name, data).then(callback);
-}
-
-function getSession(id, callback) {
-    client.Sessions.get(id).then(callback);
-}
-
-function getLastSession(sessions) {
-    const session = sessions.items[sessions.items.length-1];
-    getSession(session.sessionId, dumpResponse);
-    
-}
-
-function getResultsForLastSession(sessions, csvPath) {
-    const session = sessions.items[sessions.items.length-1].sessionId;
-    getSessionResults(session, dumpResponse, csvPath);
+    return client.DataSets.create(name, data);
 }
 
 function fakeData(interval) {
@@ -138,30 +122,12 @@ function fakeData(interval) {
     return data;
 }
 
-function postPredictionJob(dataSet, interval, callback) {
-
+function postPredictionJob(dataSet, interval) {
+    console.log('predicting');
     let start = moment.utc().startOf(interval);
     let end = moment.utc().startOf(interval).add(30, `${interval}s`);
 
-    client.Sessions.createForecast(dataSet, start, end, 'foo', interval).then(callback);
-}
-
-function getSessions(callback) {
-    var args = defaultArgs();
-
-    client.Sessions.list().then(callback);
-}
-
-
-
-function getSessionResults(id, callback) {
-    
-    client.Sessions.Get(id).then(callback);
-
-}
-
-function getData(dataSetName, callback) {
-    client.DataSets.get(dataSetName).then(callback);
+    return client.Sessions.createForecast(dataSet, start.format(), end.format(), 'foo', interval);
 }
 
 function listDataSets(callback) {
